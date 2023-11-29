@@ -600,3 +600,90 @@ VALUES
   (9, 9, 9),
   (10, 10, 10);
 ```
+
+Триггеры:
+```sql
+--Триггер для отслеживания новых отзывов и обновления средней оценки услуги в таблице Services
+CREATE OR REPLACE FUNCTION update_service_rating_function() RETURNS TRIGGER AS $$
+DECLARE
+  service_rating FLOAT;
+BEGIN
+  SELECT AVG(rating) INTO service_rating FROM Review WHERE service_id = NEW.service_id;
+  
+  UPDATE Services
+  SET rating = service_rating
+  WHERE id = NEW.service_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_service_rating
+AFTER INSERT ON Review
+FOR EACH ROW
+EXECUTE FUNCTION update_service_rating_function();
+
+--Триггер для обновления числа бонусов у клиента в таблице Guest_loyalty, когда оформляется новый заказ:
+CREATE OR REPLACE FUNCTION update_bonus_count_function() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Guest_loyalty
+  SET bonus_count = bonus_count + 1
+  WHERE guest_id = NEW.guest_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_bonus_count
+AFTER INSERT ON Services_orders
+FOR EACH ROW
+EXECUTE FUNCTION update_bonus_count_function();
+
+--Триггер для обновления числа бронирований у клиента в таблице Guests, когда создается новое бронирование:
+CREATE OR REPLACE FUNCTION update_booking_count_function() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Guests
+  SET booking_count = booking_count + 1
+  WHERE id = NEW.guest_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_booking_count
+AFTER INSERT ON Bookings
+FOR EACH ROW
+EXECUTE FUNCTION update_booking_count_function();
+
+--Триггер для автоматического обновления статуса комнаты в таблице Rooms, когда создается новое бронирование:
+CREATE OR REPLACE FUNCTION update_room_status_function() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Rooms
+  SET status_id = 2
+  WHERE id = NEW.room_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_room_status
+AFTER INSERT ON Bookings
+FOR EACH ROW
+EXECUTE FUNCTION update_room_status_function();
+
+--Триггер для обновления общего числа отзывов у сервиса в таблице Services, когда создается новый отзыв:
+CREATE OR REPLACE FUNCTION update_review_count_function() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Services
+  SET review_count = review_count + 1
+  WHERE id = NEW.service_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_review_count
+AFTER INSERT ON Review
+FOR EACH ROW
+EXECUTE FUNCTION update_review_count_function();
+```
