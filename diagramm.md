@@ -1,181 +1,6 @@
 ## диаграмма
 ![awwawa](https://github.com/ishouldbefound/SQL/assets/144837901/e5d247ce-c488-4d32-b02b-059dda6f6c81)
 ## Создание таблиц
-Countries:
-```sql
-CREATE TABLE Countries (
-  id INT PRIMARY KEY,
-  Country VARCHAR(255) NOT NULL
-);
-```
-
-Guests:
-```sql
-CREATE TABLE Guests (
-  id INT PRIMARY KEY,
-  Firstname VARCHAR(255) NOT NULL,
-  Surname VARCHAR(255) NOT NULL,
-  Phone_number VARCHAR(15),
-  email VARCHAR(255),
-  Birthday DATE,
-  Sex VARCHAR(10),
-  Country_id INT,
-  FOREIGN KEY (Country_id) REFERENCES Countries(id)
-);
-```
-
-Services:
-```sql
-CREATE TABLE Services (
-  id INT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  price FLOAT NOT NULL,
-  Phone_number VARCHAR(15)
-);
-```
-
-Services_orders: 
-```sql
-CREATE TABLE Services_orders (
-  id INT PRIMARY KEY,
-  price FLOAT NOT NULL,
-	service_id INT NOT NULL,
-	guest_id INT NOT NULL,
-	FOREIGN KEY (service_id) REFERENCES Services(id),
-  FOREIGN KEY (guest_id) REFERENCES Guests(id)
-);
-```
-
-Payments:
-```sql
-CREATE TABLE Payments (
-  id INT PRIMARY KEY,
-	guest_id INT NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  order_date DATE NOT NULL,
-  price FLOAT NOT NULL,
-  FOREIGN KEY (guest_id) REFERENCES Guests(id)
-);
-```
-
-Room_types:
-```sql
-CREATE TABLE Room_types (
-  id INT PRIMARY KEY,
-  type VARCHAR(255),
-  description VARCHAR(255)
-);
-```
-
-Statuses:
-```sql
-CREATE TABLE Statuses (
-  id INT PRIMARY KEY,
-  status VARCHAR(255)
-);
-```
-
-Rooms:
-```sql
-CREATE TABLE Rooms (
-  id INT PRIMARY KEY,
-  type_id INT NOT NULL,
-  status_id INT NOT NULL,
-  price FLOAT NOT NULL,
-  FOREIGN KEY (type_id) REFERENCES Room_types(id),
-  FOREIGN KEY (status_id) REFERENCES Statuses(id)
-);
-```
-
-Bonuses:
-```sql
-CREATE TABLE Bonuses (
-  id INT PRIMARY KEY,
-  description VARCHAR(255) NOT NULL
-);
-```
-
-Guest_loyalty:
-```sql
-CREATE TABLE Guest_loyalty (
-  id INT PRIMARY KEY,
-  guest_id INT,
-  status_id INT,
-  bonus_id INT,
-  FOREIGN KEY (guest_id) REFERENCES Guests(id),
-  FOREIGN KEY (status_id) REFERENCES Statuses(id),
-  FOREIGN KEY (bonus_id) REFERENCES Bonuses(id)
-);
-```
-
-Review:
-```sql
-CREATE TABLE Review (
-  id INT PRIMARY KEY,
-  guest_id INT,
-  service_id INT,
-  rating INT,
-  comment VARCHAR(255),
-  FOREIGN KEY (guest_id) REFERENCES Guests(id),
-  FOREIGN KEY (service_id) REFERENCES Services(id)
-);
-```
-
-Bookings:
-```sql
-CREATE TABLE Bookings (
-  id INT PRIMARY KEY,
-  guest_id INT,
-  room_id INT,
-  arrival_date DATE,
-  departure_date DATE,
-  FOREIGN KEY (guest_id) REFERENCES Guests(id),
-  FOREIGN KEY (room_id) REFERENCES Rooms(id)
-);
-```
-
-Departments: 
-```sql
-CREATE TABLE Departments (
-  id INT PRIMARY KEY,
-  title VARCHAR(255),
-  description TEXT
-);
-```
-
-Staff_positions:
-```sql
-CREATE TABLE Staff_positions (
-  id INT PRIMARY KEY,
-  position VARCHAR(255),
-  description TEXT
-);
-```
-
-Staff:
-```sql
-CREATE TABLE Staff (
-  id INT PRIMARY KEY,
-  name VARCHAR(255),
-  surname VARCHAR(255),
-  position_id INT,
-  phone_number VARCHAR(20),
-  FOREIGN KEY (position_id) REFERENCES Staff_positions(id)
-);
-```
-
-Staff_departments:
-```sql
-CREATE TABLE Staff_departments (
-  id INT PRIMARY KEY,
-  department_id INT,
-  staff_id INT,
-  FOREIGN KEY (staff_id) REFERENCES Staff(id)
-);
-```
-
-## code for me
 ```sql
 CREATE TABLE Countries (
   id INT PRIMARY KEY,
@@ -191,6 +16,7 @@ CREATE TABLE Guests (
   Birthday DATE,
   Sex VARCHAR(10),
   Country_id INT,
+  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (Country_id) REFERENCES Countries(id)
 );
 
@@ -271,6 +97,7 @@ CREATE TABLE Bookings (
   room_id INT,
   arrival_date DATE,
   departure_date DATE,
+  total_cost FLOAT,
   FOREIGN KEY (guest_id) REFERENCES Guests(id),
   FOREIGN KEY (room_id) REFERENCES Rooms(id)
 );
@@ -304,7 +131,7 @@ CREATE TABLE Staff_departments (
 );
 ```
 
-Внесение записей в таблицу:
+## Внесение записей в таблицу
 ```sql
 INSERT INTO Countries (id, Country) VALUES
   (1, 'США'),
@@ -430,8 +257,7 @@ VALUES
   (1, 'Свободна'),
   (2, 'Занята'),
   (3, 'Действителен'),
-  (4, 'Не действителен'),
-
+  (4, 'Не действителен');
 
 INSERT INTO Rooms (id, type_id, status_id, price)
 VALUES
@@ -515,38 +341,38 @@ VALUES
   (19, 21, 4, 5, 'Отдых прошел замечательно, все понравилось!'),
   (20, 20, 5, 4, 'Хорошее обслуживание, немного шумно в номере.');
 
-INSERT INTO Bookings (id, guest_id, room_id, arrival_date, departure_date)
+INSERT INTO Bookings (id, guest_id, room_id, arrival_date, departure_date, total_cost)
 VALUES
-  (1, 1, 1, '2023-01-15', '2023-01-20'),
-  (2, 2, 2, '2023-02-10', '2023-02-15'),
-  (3, 3, 3, '2023-03-05', '2023-03-10'),
-  (4, 4, 4, '2023-04-20', '2023-04-25'),
-  (5, 5, 5, '2023-05-15', '2023-05-20'),
-  (6, 6, 6, '2023-06-10', '2023-06-15'),
-  (7, 7, 7, '2023-07-05', '2023-07-10'),
-  (8, 8, 8, '2023-08-20', '2023-08-25'),
-  (9, 9, 9, '2023-09-15', '2023-09-20'),
-  (10, 10, 10, '2023-10-10', '2023-10-15'),
-  (11, 1, 11, '2023-11-05', '2023-11-10'),
-  (12, 2, 12, '2023-12-20', '2023-12-25'),
-  (13, 3, 13, '2024-01-15', '2024-01-20'),
-  (14, 4, 14, '2024-02-10', '2024-02-15'),
-  (15, 5, 15, '2024-03-05', '2024-03-10'),
-  (16, 6, 16, '2024-04-20', '2024-04-25'),
-  (17, 7, 17, '2024-05-15', '2024-05-20'),
-  (18, 8, 18, '2024-06-10', '2024-06-15'),
-  (19, 9, 19, '2024-07-05', '2024-07-10'),
-  (20, 10, 20, '2024-08-20', '2024-08-25'),
-  (21, 1, 21, '2024-09-15', '2024-09-20'),
-  (22, 2, 22, '2024-10-10', '2024-10-15'),
-  (23, 3, 23, '2024-11-05', '2024-11-10'),
-  (24, 4, 24, '2024-12-20', '2024-12-25'),
-  (25, 5, 25, '2025-01-15', '2025-01-20'),
-  (26, 6, 26, '2025-02-10', '2025-02-15'),
-  (27, 7, 27, '2025-03-05', '2025-03-10'),
-  (28, 8, 28, '2025-04-20', '2025-04-25'),
-  (29, 9, 29, '2025-05-15', '2025-05-20'),
-  (30, 10, 30, '2025-06-10', '2025-06-15');
+  (1, 1, 1, '2023-01-15', '2023-01-20', 500),
+  (2, 2, 2, '2023-01-15', '2023-01-20', 500),
+  (3, 3, 3, '2023-01-15', '2023-01-20', 500),
+  (4, 4, 4, '2023-01-15', '2023-01-20', 500),
+  (5, 5, 5, '2023-01-15', '2023-01-20', 500),
+  (6, 6, 6, '2023-01-15', '2023-01-20', 500),
+  (7, 7, 7, '2023-01-15', '2023-01-20', 500),
+  (8, 8, 8, '2023-01-15', '2023-01-20', 500),
+  (9, 9, 9, '2023-01-15', '2023-01-20', 500),
+  (10, 10, 10, '2023-01-15', '2023-01-20', 500),
+  (11, 11, 11, '2023-01-15', '2023-01-20', 500),
+  (12, 12, 12, '2023-01-15', '2023-01-20', 500),
+  (13, 13, 13, '2023-01-15', '2023-01-20', 500),
+  (14, 14, 14, '2023-01-15', '2023-01-20', 500),
+  (15, 15, 15, '2023-01-15', '2023-01-20', 500),
+  (16, 16, 16, '2023-01-15', '2023-01-20', 500),
+  (17, 17, 17, '2023-01-15', '2023-01-20', 500),
+  (18, 18, 18, '2023-01-15', '2023-01-20', 500),
+  (19, 19, 19, '2023-01-15', '2023-01-20', 500),
+  (20, 20, 20, '2023-01-15', '2023-01-20', 500),
+  (21, 21, 21, '2023-01-15', '2023-01-20', 500),
+  (22, 22, 22, '2023-01-15', '2023-01-20', 500),
+  (23, 23, 23, '2023-01-15', '2023-01-20', 500),
+  (24, 24, 24, '2023-01-15', '2023-01-20', 500),
+  (25, 25, 25, '2023-01-15', '2023-01-20', 500),
+  (26, 26, 26, '2023-01-15', '2023-01-20', 500),
+  (27, 27, 27, '2023-01-15', '2023-01-20', 500),
+  (28, 28, 28, '2023-01-15', '2023-01-20', 500),
+  (29, 29, 29, '2023-01-15', '2023-01-20', 500),
+  (30, 30, 30, '2023-01-15', '2023-01-20', 500);
 
 INSERT INTO Departments (id, title, description)
 VALUES
@@ -603,87 +429,55 @@ VALUES
 
 Триггеры:
 ```sql
---Триггер для отслеживания новых отзывов и обновления средней оценки услуги в таблице Services
-CREATE OR REPLACE FUNCTION update_service_rating_function() RETURNS TRIGGER AS $$
-DECLARE
-  service_rating FLOAT;
-BEGIN
-  SELECT AVG(rating) INTO service_rating FROM Review WHERE service_id = NEW.service_id;
-  
-  UPDATE Services
-  SET rating = service_rating
-  WHERE id = NEW.service_id;
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_service_rating
-AFTER INSERT ON Review
-FOR EACH ROW
-EXECUTE FUNCTION update_service_rating_function();
-
---Триггер для обновления числа бонусов у клиента в таблице Guest_loyalty, когда оформляется новый заказ:
-CREATE OR REPLACE FUNCTION update_bonus_count_function() RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE Guest_loyalty
-  SET bonus_count = bonus_count + 1
-  WHERE guest_id = NEW.guest_id;
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_bonus_count
-AFTER INSERT ON Services_orders
-FOR EACH ROW
-EXECUTE FUNCTION update_bonus_count_function();
-
---Триггер для обновления числа бронирований у клиента в таблице Guests, когда создается новое бронирование:
-CREATE OR REPLACE FUNCTION update_booking_count_function() RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE Guests
-  SET booking_count = booking_count + 1
-  WHERE id = NEW.guest_id;
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_booking_count
-AFTER INSERT ON Bookings
-FOR EACH ROW
-EXECUTE FUNCTION update_booking_count_function();
-
---Триггер для автоматического обновления статуса комнаты в таблице Rooms, когда создается новое бронирование:
-CREATE OR REPLACE FUNCTION update_room_status_function() RETURNS TRIGGER AS $$
+-- обновляет статус комнаты если до этого была свободна, а затем забронирована
+CREATE OR REPLACE FUNCTION update_room_status()
+RETURNS TRIGGER AS $$
 BEGIN
   UPDATE Rooms
-  SET status_id = 2
+  SET status_id = 2  -- Замените на нужный вам ID статуса для "забронирована"
   WHERE id = NEW.room_id;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_room_status
+CREATE TRIGGER bookings_update_room_status
 AFTER INSERT ON Bookings
 FOR EACH ROW
-EXECUTE FUNCTION update_room_status_function();
+EXECUTE FUNCTION update_room_status();
 
---Триггер для обновления общего числа отзывов у сервиса в таблице Services, когда создается новый отзыв:
-CREATE OR REPLACE FUNCTION update_review_count_function() RETURNS TRIGGER AS $$
+-- обновляет статус комнаты после завершения бронирования
+CREATE OR REPLACE FUNCTION update_room_status_after_checkout()
+RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE Services
-  SET review_count = review_count + 1
-  WHERE id = NEW.service_id;
+  IF NEW.departure_date IS NOT NULL THEN
+    UPDATE Rooms
+    SET status_id = 1  -- Замените на нужный вам ID статуса для "свободна"
+    WHERE id = NEW.room_id;
+  END IF;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_review_count
-AFTER INSERT ON Review
+-- создает новые записи в таблице Payments при вставке нового бронирования:
+CREATE TRIGGER bookings_update_room_status_after_checkout
+BEFORE UPDATE ON Bookings
 FOR EACH ROW
-EXECUTE FUNCTION update_review_count_function();
+EXECUTE FUNCTION update_room_status_after_checkout();
+
+CREATE OR REPLACE FUNCTION create_payment_after_booking()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO Payments (id, guest_id, description, order_date, price)
+  VALUES (NEW.id, NEW.guest_id, 'Booking payment', NOW(), NEW.total_cost);
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER bookings_create_payment
+AFTER INSERT ON Bookings
+FOR EACH ROW
+EXECUTE FUNCTION create_payment_after_booking();
 ```
