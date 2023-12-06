@@ -452,7 +452,7 @@ RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.departure_date IS NOT NULL THEN
     UPDATE Rooms
-    SET status_id = 1  -- Замените на нужный вам ID статуса для "свободна"
+    SET status_id = 1
     WHERE id = NEW.room_id;
   END IF;
 
