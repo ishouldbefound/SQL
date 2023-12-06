@@ -434,7 +434,7 @@ CREATE OR REPLACE FUNCTION update_room_status()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE Rooms
-  SET status_id = 2  -- Замените на нужный вам ID статуса для "забронирована"
+  SET status_id = 2
   WHERE id = NEW.room_id;
 
   RETURN NEW;
