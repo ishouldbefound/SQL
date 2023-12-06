@@ -460,12 +460,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- создает новые записи в таблице Payments при вставке нового бронирования:
 CREATE TRIGGER bookings_update_room_status_after_checkout
 BEFORE UPDATE ON Bookings
 FOR EACH ROW
 EXECUTE FUNCTION update_room_status_after_checkout();
 
+-- создает новые записи в таблице Payments при вставке нового бронирования:
 CREATE OR REPLACE FUNCTION create_payment_after_booking()
 RETURNS TRIGGER AS $$
 BEGIN
